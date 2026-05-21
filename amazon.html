@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>亚马逊运营速成手册</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'PingFang SC', 'Noto Sans SC', sans-serif; background: #080C10; color: #EEE; min-height: 100vh; }
+  button { cursor: pointer; font-family: inherit; }
+
+  /* Header */
+  .header { background: linear-gradient(135deg,#1a0a00,#0f1a0a,#0a0a1a); border-bottom: 1px solid #333; padding: 20px 20px 14px; position: sticky; top: 0; z-index: 100; }
+  .header-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .amazon-badge { background: #FF9900; color: #000; font-weight: 900; font-size: 17px; padding: 3px 10px; border-radius: 4px; }
+  .header-sub { color: #FF9900; font-size: 12px; font-weight: 600; letter-spacing: 2px; }
+  .header-desc { color: #666; font-size: 11px; margin-bottom: 14px; }
+  .tab-bar { display: flex; gap: 8px; }
+  .tab-btn { padding: 8px 18px; border-radius: 20px; border: 1px solid; font-size: 12px; font-weight: 600; transition: all .2s; background: transparent; }
+  .tab-btn.active { background: #FF9900; border-color: #FF9900; color: #000; }
+  .tab-btn:not(.active) { border-color: #333; color: #888; }
+
+  /* ====== KNOWLEDGE TAB ====== */
+  #tab-knowledge { display: block; }
+  #tab-interview, #tab-metrics { display: none; }
+
+  .section-nav { display: flex; overflow-x: auto; gap: 8px; padding: 14px 16px; scrollbar-width: none; }
+  .section-nav::-webkit-scrollbar { display: none; }
+  .sec-btn { flex-shrink: 0; padding: 8px 14px; border-radius: 8px; border: 1px solid #2a2a2a; background: #111; color: #666; font-size: 12px; font-weight: 600; white-space: nowrap; transition: all .2s; }
+  .sec-btn.active { color: var(--c); border-color: var(--c); background: color-mix(in srgb, var(--c) 15%, transparent); }
+
+  .section-content { padding: 0 16px 32px; }
+  .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid color-mix(in srgb, var(--c) 20%, transparent); }
+  .section-title h2 { font-size: 16px; font-weight: 700; color: var(--c); }
+
+  .accordion { margin-bottom: 10px; border: 1px solid #222; border-radius: 10px; overflow: hidden; transition: border-color .2s; }
+  .accordion.open { border-color: color-mix(in srgb, var(--c) 40%, transparent); }
+  .acc-trigger { width: 100%; padding: 14px 16px; border: none; background: #111; color: #DDD; text-align: left; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 8px; line-height: 1.4; transition: background .2s, color .2s; }
+  .accordion.open .acc-trigger { background: color-mix(in srgb, var(--c) 10%, transparent); color: var(--c); }
+  .acc-arrow { font-size: 13px; transition: transform .2s; flex-shrink: 0; }
+  .accordion.open .acc-arrow { transform: rotate(180deg); }
+  .acc-body { display: none; padding: 14px 16px; background: #0d0d0d; border-top: 1px solid color-mix(in srgb, var(--c) 15%, transparent); font-size: 12px; line-height: 1.8; color: #C8C4BE; white-space: pre-line; }
+  .accordion.open .acc-body { display: block; }
+
+  /* ====== METRICS TAB ====== */
+  .metrics-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 14px; }
+  .metric-btn { padding: 10px 6px; border-radius: 10px; border: 1.5px solid #1e1e2e; background: #0f0f1a; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all .15s; }
+  .metric-btn.active { border-color: var(--c); background: color-mix(in srgb, var(--c) 10%, transparent); }
+  .metric-btn .m-emoji { font-size: 18px; }
+  .metric-btn .m-name { font-size: 12px; font-weight: 800; color: #AAA; }
+  .metric-btn.active .m-name { color: var(--c); }
+
+  .metric-detail { margin: 0 14px 32px; background: #0d1117; border: 1px solid #222; border-radius: 16px; overflow: hidden; transition: border-color .2s; }
+  .detail-header { padding: 18px 18px 14px; border-bottom: 1px solid #1a1a2e; }
+  .detail-title-row { display: flex; align-items: center; gap: 10px; }
+  .detail-emoji { font-size: 28px; }
+  .detail-name { font-size: 22px; font-weight: 900; letter-spacing: -.5px; }
+  .detail-full { font-size: 11px; color: #666; margin-left: 6px; }
+  .detail-cn { font-size: 12px; color: #AAA; margin-top: 3px; }
+
+  .detail-tabs { display: flex; border-bottom: 1px solid #1a1a2e; }
+  .dtab { flex: 1; padding: 11px; border: none; background: transparent; color: #555; font-size: 12px; font-weight: 400; border-bottom: 2px solid transparent; transition: all .15s; }
+  .dtab.active { color: var(--c); border-bottom-color: var(--c); font-weight: 700; }
+
+  .detail-body { padding: 18px; }
+  .detail-panel { display: none; }
+  .detail-panel.active { display: block; }
+
+  .info-box { background: #070a0f; border: 1px solid #1e1e2e; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+  .info-label { font-size: 10px; color: #555; letter-spacing: 2px; margin-bottom: 8px; }
+  .formula-text { font-size: 13px; font-weight: 700; font-family: monospace; }
+  .example-text { font-size: 12px; color: #CCC; line-height: 1.7; }
+  .remember-box { border-radius: 10px; padding: 14px; }
+  .remember-label { font-size: 10px; letter-spacing: 2px; margin-bottom: 8px; font-weight: 700; }
+  .remember-text { font-size: 12px; color: #DDD; line-height: 1.8; }
+
+  .level-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; margin-bottom: 8px; border-radius: 10px; }
+  .level-left { display: flex; align-items: center; gap: 8px; }
+  .level-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .level-label { font-size: 13px; color: #CCC; font-weight: 600; }
+  .level-value { font-size: 14px; font-weight: 800; font-family: monospace; }
+
+  .action-item { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid #111; align-items: flex-start; }
+  .action-item:last-child { border-bottom: none; }
+  .action-num { width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .action-text { font-size: 12px; color: #CCC; line-height: 1.7; }
+
+  .quick-ref { margin: 14px 14px 32px; background: #0d1117; border: 1px solid #1a1a2e; border-radius: 12px; padding: 14px; }
+  .quick-label { font-size: 10px; color: #555; letter-spacing: 2px; margin-bottom: 10px; }
+  .quick-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .quick-tag { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid; background: transparent; }
+
+  /* ====== INTERVIEW TAB ====== */
+  .interview-alert { background: linear-gradient(135deg,#1a0f00,#0f1a00); border: 1px solid #FF9900; border-radius: 12px; padding: 16px; margin: 16px 16px 0; }
+  .alert-title { font-size: 13px; font-weight: 700; color: #FF9900; margin-bottom: 8px; }
+  .alert-body { font-size: 11px; color: #AAA; line-height: 1.7; }
+  .alert-body strong { color: #FFF; }
+
+  .interview-section { padding: 16px 16px 0; }
+  .int-sec-title { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #222; }
+  .int-sec-title h3 { font-size: 14px; font-weight: 700; color: #DDD; }
+
+  .int-accordion { margin-bottom: 8px; border: 1px solid #222; border-radius: 10px; overflow: hidden; }
+  .int-accordion.open { border-color: #2196F344; }
+  .int-accordion.special.open { border-color: #9C27B044; }
+  .int-trigger { width: 100%; padding: 13px 16px; border: none; background: #111; color: #CCC; text-align: left; font-size: 12px; font-weight: 600; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; line-height: 1.5; }
+  .int-accordion.open .int-trigger { background: #2196F311; color: #90CAF9; }
+  .int-accordion.special.open .int-trigger { background: #9C27B011; color: #CE93D8; }
+  .int-body { display: none; padding: 13px 16px; background: #0d0d0d; border-top: 1px solid #1a1a2e; }
+  .int-accordion.open .int-body { display: block; }
+  .int-body-label { font-size: 11px; color: #AAA; font-weight: 600; letter-spacing: 1px; margin-bottom: 6px; }
+  .int-body-text { font-size: 12px; color: #C8C4BE; line-height: 1.8; }
+
+  .tips-box { background: #111; border: 1px solid #333; border-radius: 12px; padding: 16px; margin: 16px 16px 32px; }
+  .tips-title { font-size: 13px; font-weight: 700; color: #4CAF50; margin-bottom: 10px; }
+  .tip-item { display: flex; gap: 8px; margin-bottom: 8px; font-size: 12px; color: #AAA; line-height: 1.5; }
+  .tip-arrow { color: #4CAF50; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <div class="amazon-badge">amazon</div>
+    <div class="header-sub">运营速成手册</div>
+  </div>
+  <div class="header-desc">核心知识 · 参数解析 · 面试预测</div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchMain('knowledge')">📚 核心知识库</button>
+    <button class="tab-btn" onclick="switchMain('metrics')">📊 参数解析</button>
+    <button class="tab-btn" onclick="switchMain('interview')">🎤 面试题预测</button>
+  </div>
+</div>
+
+<!-- ===== KNOWLEDGE TAB ===== -->
+<div id="tab-knowledge">
+  <div class="section-nav" id="secNav"></div>
+  <div class="section-content" id="secContent"></div>
+</div>
+
+<!-- ===== METRICS TAB ===== -->
+<div id="tab-metrics">
+  <div class="metrics-grid" id="metricsGrid"></div>
+  <div class="metric-detail" id="metricDetail"></div>
+  <div class="quick-ref">
+    <div class="quick-label">所有参数一览</div>
+    <div class="quick-tags" id="quickTags"></div>
+  </div>
+</div>
+
+<!-- ===== INTERVIEW TAB ===== -->
+<div id="tab-interview">
+  <div class="interview-alert">
+    <div class="alert-title">💡 面试官会怎么看你？</div>
+    <div class="alert-body">作为零基础面试者，面试官预期你<strong>不懂操作细节</strong>，但会重点考察：<strong>学习意愿</strong>、<strong>逻辑思维</strong>、<strong>数据敏感度</strong>和<strong>抗压能力</strong>。遇到不懂的问题，坦诚说"我还没有实操经验，但我的思路是..."，远比乱答更好。</div>
+  </div>
+  <div id="interviewContent"></div>
+  <div class="tips-box">
+    <div class="tips-title">✅ 面试加分技巧</div>
+    <div class="tip-item"><span class="tip-arrow">▸</span><span>提前注册亚马逊买家账号，了解购物体验和Listing结构</span></div>
+    <div class="tip-item"><span class="tip-arrow">▸</span><span>准备1-2个竞品分析案例：「我分析了XX类目，发现...」</span></div>
+    <div class="tip-item"><span class="tip-arrow">▸</span><span>展示学习行动：说明你已看过哪些资料或课程</span></div>
+    <div class="tip-item"><span class="tip-arrow">▸</span><span>问面试官有深度的问题：「贵公司目前主推哪些类目？TACoS大概在什么水平？」</span></div>
+    <div class="tip-item"><span class="tip-arrow">▸</span><span>坦诚承认短板，但立即接「我已经在...」展示行动力</span></div>
+  </div>
+</div>
+
+<script>
+// ============ DATA ============
+const sections = [
+  { id:"overview", icon:"📦", title:"亚马逊运营核心概念", color:"#FF9900", items:[
+    { q:"什么是亚马逊运营？", a:"亚马逊运营是指在亚马逊平台上管理店铺日常运作的工作，包括：\n• 选品 / 上架 / 优化Listing\n• 广告投放（PPC）\n• 库存管理与补货\n• 数据分析与销售决策\n• 处理客户评价与纠纷\n• 参与促销活动（Prime Day / Black Friday）等" },
+    { q:"FBA vs FBM 是什么？", a:"FBA（Fulfillment by Amazon）：卖家将货物发送到亚马逊仓库，由亚马逊负责仓储、发货、客服。\n优点：可获得Prime标志，转化率高\n缺点：仓储费用高，库存压力大\n\nFBM（Fulfillment by Merchant）：卖家自行发货，适合大件/定制化产品，成本可控但缺少Prime优势。" },
+    { q:"Listing优化包含哪些要素？", a:"① 标题（Title）：含核心关键词，不超过200字符\n② 五点描述（Bullet Points）：突出卖点，嵌入长尾词\n③ 产品描述（Description）：品牌故事+使用场景\n④ A+内容（品牌注册后）：图文并茂提升转化\n⑤ 主图+辅图：白底主图+场景图+尺寸图\n⑥ 后台Search Terms：隐藏关键词，不重复前台" },
+    { q:"什么是Buy Box（黄金购物车）？", a:"Buy Box是亚马逊详情页右侧的「加入购物车」按钮入口。同一ASIN可能有多个卖家竞争，但只有一个卖家获得Buy Box。\n\n赢得Buy Box的关键因素：\n• FBA发货（大幅加分）\n• 价格竞争力\n• 卖家绩效（好评率、发货速度）\n• 账号健康度\n\n没有Buy Box的卖家，销量会大幅下降。" },
+  ]},
+  { id:"advertising", icon:"📊", title:"广告与流量（PPC）", color:"#E8450A", items:[
+    { q:"亚马逊PPC广告类型有哪些？", a:"① SP（Sponsored Products）：最常用，推广单个ASIN，出现在搜索结果和详情页\n② SB（Sponsored Brands）：品牌注册后可用，展示品牌Logo+多个产品\n③ SD（Sponsored Display）：再营销广告，追踪浏览/购买过的用户\n④ SV（Sponsored TV）：视频广告（较新）" },
+    { q:"自动广告 vs 手动广告有什么区别？", a:"自动广告（Auto）：亚马逊自动匹配关键词，覆盖面广，适合新品期挖词\n\n手动广告（Manual）：卖家自定义关键词，分三种匹配方式：\n• 精准匹配（Exact）：只匹配完全相同的词，转化高\n• 词组匹配（Phrase）：匹配含该词组的搜索，居中\n• 宽泛匹配（Broad）：最宽泛，覆盖面大但可能不精准\n\n新品策略：先开自动广告2-3周挖词，再将高转化词加入手动精准广告。" },
+    { q:"新品期广告策略是什么？", a:"新品期（0-90天）重点是积累评价和排名：\n① 开自动广告，宽泛匹配，挖掘关键词\n② 跑2-3周后，将高转化词加入手动精准广告\n③ 适当提高竞价，允许ACoS偏高（可接受30-50%）\n④ 配合Vine计划获取早期评价\n⑤ 设置否定词，过滤无效流量" },
+  ]},
+  { id:"inventory", icon:"🏭", title:"库存与供应链管理", color:"#067D62", items:[
+    { q:"如何做库存管理和补货决策？", a:"核心公式：补货量 = 日均销量 × (采购周期 + 安全库存天数)\n\n关键指标：\n• IPI（库存绩效指数）：亚马逊评分，低于450会限制入仓量，需保持550+\n• 库存周转率：库存天数（Days of Supply）建议维持在45-60天\n• 滞销品处理：降价促销 / 创建Removal Order / 参与FBA Liquidation" },
+    { q:"海运 vs 空运如何选择？", a:"海运：成本低，约$1-3/kg，但时效长（25-40天）\n适合：大批量补货、旺季前2-3个月、低价重货\n\n空运：成本高，约$5-10/kg，时效快（5-10天）\n适合：急补货、高价值轻货、新品测款\n\n混合策略：大货走海运打底，空运应急补量" },
+    { q:"常见供应链问题如何处理？", a:"① 断货（Out of Stock）：提前2-4周预警；断货期间暂停广告降低损失；考虑空运应急\n② 压货（Overstock）：降低广告竞价；发起Lightning Deal促销；申请Removal Order\n③ 被跟卖：品牌备案后可发送侵权警告；举报跟卖账号；设置价格保护" },
+  ]},
+  { id:"data", icon:"📈", title:"数据分析", color:"#1565C0", items:[
+    { q:"运营需要掌握哪些核心数据？", a:"销售维度：\n• BSR（Best Seller Rank）：类目排名，直接反映销量\n• Session（流量）& Unit Session Percentage（转化率）\n• 退货率：超5%需关注，超10%预警\n\n利润维度：\n• 净利润 = 售价 - FBA费 - 商品成本 - 广告费 - 退货损耗 - 平台佣金（约8-15%）\n\n广告维度：ACoS / TACoS / CTR / CVR（详见参数解析）" },
+    { q:"如何分析一个新品是否值得做？", a:"① 市场需求：月销量>300单，搜索量稳定增长（用Jungle Scout/Helium10分析）\n② 竞争分析：头部ASIN评价数<500，留有进入空间\n③ 利润测算：售价 × 0.75（扣除平台+FBA）- 成本 > 0，利润率建议>20%\n④ 差评分析：看竞品1-2星评价，找产品改进点\n⑤ 季节性判断：用Google Trends确认是否为爆款或季节品" },
+    { q:"常用的亚马逊运营工具有哪些？", a:"• Jungle Scout / Helium 10：选品分析、关键词挖掘、竞品监控（最常用）\n• Keepa：追踪产品历史价格和BSR走势\n• SellerBoard / Selleramp：利润计算和财务分析\n• Canva / Photoshop：主图和A+内容设计\n• 亚马逊原生后台：Seller Central（必须熟练）" },
+  ]},
+  { id:"compliance", icon:"⚠️", title:"合规与账号安全", color:"#6A1B9A", items:[
+    { q:"亚马逊账号有哪些常见风险？", a:"① Listing下架：标题违规（夸大宣传）、侵权（图片/商标）、类目错误\n② 绩效指标警告：ODR（订单缺陷率）>1%、迟发率>4%、取消率>2.5%\n③ 账号关联（Related Account）：不同账号用同设备/IP/银行卡登录\n④ 知识产权投诉（IP Complaint）：被品牌方投诉，需提供授权书或撤诉\n⑤ Review操控：刷评被发现，轻则删评重则封号" },
+    { q:"收到绩效警告如何写申诉（POA）？", a:"POA（Plan of Action）三段式模板：\n① 根本原因（Root Cause）：客观说明问题是如何发生的\n② 已采取行动（Immediate Action）：已做了什么补救措施\n③ 预防措施（Preventive Measures）：将来如何避免再次发生\n\n关键原则：不要为自己辩解，不要情绪化，要具体可执行，避免模糊表述。" },
+    { q:"什么是品牌备案（Brand Registry）？有什么用？", a:"品牌备案是亚马逊为品牌商提供的保护机制，需要有注册商标才能申请。\n\n申请后的权益：\n• 可使用A+内容（提升转化率）\n• 可开SB/SD广告\n• 更快速处理侵权投诉\n• 可使用Vine计划获取真实评价\n• 可开设品牌旗舰店（Brand Store）\n\n建议有长期规划的卖家尽早注册商标并备案。" },
+  ]},
+];
+
+const metrics = [
+  { id:"acos", name:"ACoS", full:"Advertising Cost of Sales", cn:"广告销售成本比", color:"#FF6B35", emoji:"🎯",
+    formula:"广告花费 ÷ 广告带来的销售额", example:"花了100元广告费，带来500元销售额 → ACoS = 20%",
+    benchmark:"新品期可接受30-50%；成熟品控制在20%以下",
+    remember:"ACoS衡量的是广告本身是否赚钱。ACoS低不一定好——新品期需要高ACoS换曝光。",
+    levels:[{label:"优秀",value:"<15%",color:"#4CAF50"},{label:"健康",value:"15-25%",color:"#FF9900"},{label:"警戒",value:">30%",color:"#F44336"}],
+    actions:["否定低转化关键词，减少无效点击","优化Listing主图和价格提升转化率","精准匹配替代宽泛匹配，减少不相关展示","新品期允许偏高，不要过早压低竞价"]},
+  { id:"tacos", name:"TACoS", full:"Total Advertising Cost of Sales", cn:"总广告销售成本比", color:"#E91E8C", emoji:"📊",
+    formula:"广告花费 ÷ 总销售额（含自然单）", example:"花了100元广告费，总销售额（广告+自然）2000元 → TACoS = 5%",
+    benchmark:"健康水平在5-10%；低于5%说明自然流量很强",
+    remember:"TACoS才是衡量整体运营健康度的真正指标。ACoS好看但TACoS高，说明你严重依赖广告，自然排名很差。",
+    levels:[{label:"优秀",value:"<5%",color:"#4CAF50"},{label:"健康",value:"5-10%",color:"#FF9900"},{label:"危险",value:">15%",color:"#F44336"}],
+    actions:["TACoS持续下降 = 自然排名在提升，广告在起效","TACoS不降反升 = 自然流量在萎缩，需查排名","对比ACoS和TACoS差距，差距越大说明自然单越多"]},
+  { id:"ctr", name:"CTR", full:"Click-Through Rate", cn:"点击率", color:"#00BCD4", emoji:"👆",
+    formula:"点击次数 ÷ 展示次数 × 100%", example:"广告展示了1000次，有5个人点击 → CTR = 0.5%",
+    benchmark:"行业平均约0.3%-0.5%；高于0.5%算良好",
+    remember:"CTR低说明你的主图或标题没有吸引力——买家看了一眼就划走了。CTR是漏斗的第一关。",
+    levels:[{label:"优秀",value:">0.5%",color:"#4CAF50"},{label:"正常",value:"0.3-0.5%",color:"#FF9900"},{label:"偏低",value:"<0.3%",color:"#F44336"}],
+    actions:["优化主图：白底清晰、产品占图片85%以上","测试不同主图（A/B Test）","检查标题是否含核心关键词","价格是否有竞争力（价格在搜索结果直接可见）"]},
+  { id:"cvr", name:"CVR", full:"Conversion Rate", cn:"转化率 / Unit Session %", color:"#8BC34A", emoji:"💰",
+    formula:"购买订单数 ÷ 访客数（Session）× 100%", example:"100个人访问了你的详情页，10个人下单 → CVR = 10%",
+    benchmark:"行业平均10-15%；高于15%算优秀",
+    remember:"CVR低说明买家进了你的详情页但不买——问题出在价格、图片、评价、描述上，而不是流量。",
+    levels:[{label:"优秀",value:">15%",color:"#4CAF50"},{label:"正常",value:"10-15%",color:"#FF9900"},{label:"偏低",value:"<10%",color:"#F44336"}],
+    actions:["增加评价数量（目标先做到30条以上）","优化A+内容，图文展示使用场景","价格对比竞品，考虑小幅调低测试","检查五点描述是否突出了核心卖点"]},
+  { id:"bsr", name:"BSR", full:"Best Seller Rank", cn:"类目销售排名", color:"#FF9900", emoji:"🏆",
+    formula:"由亚马逊根据近期销量实时计算，数字越小越好", example:"BSR #1 = 该类目销量第一；BSR #500 = 类目第500名",
+    benchmark:"进入类目前100名竞争力较强；前10名是头部",
+    remember:"BSR是最直观的销量健康指标。BSR突然大幅下跌，说明销量在萎缩，要马上查原因。",
+    levels:[{label:"头部",value:"前50名",color:"#4CAF50"},{label:"竞争圈",value:"前500名",color:"#FF9900"},{label:"边缘",value:"500名以后",color:"#888"}],
+    actions:["BSR跌了先查：是否断货、是否有差评涌入、广告是否在跑","用Keepa工具查历史BSR走势，判断是季节性下滑还是异常","新品冲BSR：设置优惠券+广告组合拳集中推7-14天"]},
+  { id:"odr", name:"ODR", full:"Order Defect Rate", cn:"订单缺陷率", color:"#F44336", emoji:"⚠️",
+    formula:"（差评订单 + 退款纠纷 + 信用卡拒付）÷ 总订单数", example:"100个订单里有3个差评/纠纷 → ODR = 3%（严重超标）",
+    benchmark:"亚马逊硬性要求低于1%，超过会封号警告",
+    remember:"ODR是账号安全的红线指标。它不是运营优化目标，而是生死线——超过1%随时可能封号。",
+    levels:[{label:"安全",value:"<0.5%",color:"#4CAF50"},{label:"警戒",value:"0.5-1%",color:"#FF9900"},{label:"危险",value:">1%",color:"#F44336"}],
+    actions:["主动联系差评客户解决问题（不能要求删评，但可解决售后）","收到A-to-Z纠纷24小时内必须响应","定期检查Seller Central绩效通知","产品质量是根本，出货前严格QC"]},
+  { id:"session", name:"Session", full:"Page Session / 流量", cn:"访客数", color:"#9C27B0", emoji:"👥",
+    formula:"同一用户在24小时内的访问算1个Session", example:"今天有500个不同访客浏览了你的详情页 → Session = 500",
+    benchmark:"新品期每天50-100 Session；爆款可达1000+",
+    remember:"Session是流量的入口。Session低+CVR高说明流量精准，值得加大广告投入。",
+    levels:[{label:"冷启动",value:"<100/天",color:"#888"},{label:"成长期",value:"100-500/天",color:"#FF9900"},{label:"爆款",value:">1000/天",color:"#4CAF50"}],
+    actions:["Session突然下跌：检查广告是否跑完预算、关键词排名是否掉落","Session高CVR低：详情页有问题，重点优化转化","Session低CVR高：广告精准但流量不够，可加大投放"]},
+  { id:"ipi", name:"IPI", full:"Inventory Performance Index", cn:"库存绩效指数", color:"#067D62", emoji:"🏭",
+    formula:"综合评分（满分1000），由过量库存+滞销率+在架率+卖出率计算", example:"IPI 600分 = 库存管理良好；IPI 400分 = 面临入仓量限制",
+    benchmark:"亚马逊要求450以上；健康水平550+",
+    remember:"IPI是亚马逊在问你：'你的货占了我仓库，有没有在好好卖？'热销品不断货+慢销品不积压，分数自然高。",
+    levels:[{label:"优秀",value:">600",color:"#4CAF50"},{label:"达标",value:"450-600",color:"#FF9900"},{label:"受限",value:"<450",color:"#F44336"}],
+    actions:["过量库存：发起促销或撤仓（Removal Order）","滞销库存：修复下架Listing，让货重新可售","提高在架率：热销品提前补货，不要断货","提升卖出率：广告+促销加速周转"]},
+];
+
+const interviewData = [
+  { category:"基础认知", icon:"🎯", special:false, questions:[
+    { q:"请介绍一下你对亚马逊平台的了解", tip:"提FBA/FBM区别、Buy Box机制、A9算法权重因素（销量/转化/相关性）" },
+    { q:"你了解哪些选品方法？", tip:"提Jungle Scout/Helium10工具使用、蓝海选品思路、竞品差评分析" },
+    { q:"如何优化一个转化率低的Listing？", tip:"分析流量来源→检查主图→价格竞争力→评价数量→A+内容，按漏斗逐层排查" },
+  ]},
+  { category:"数据与分析", icon:"📊", special:false, questions:[
+    { q:"如果一个产品ACoS很高，你会如何处理？", tip:"先看是否新品期（可接受高ACoS）→分析关键词表现→否定低效词→降低竞价→优化Listing转化率" },
+    { q:"如何判断一款产品是否值得继续推？", tip:"结合TACoS趋势、BSR变化、利润率、库存周转率综合判断，给出具体数据门槛" },
+    { q:"请解释一下IPI是什么，如何提升？", tip:"库存绩效指数=过量库存+滞销率+入仓入库速度+在架率，具体提升方法各项对应" },
+  ]},
+  { category:"问题解决", icon:"🔧", special:false, questions:[
+    { q:"如果Listing突然流量大幅下跌，你如何排查？", tip:"检查排名变化→广告预算是否耗尽→是否有差评涌入→是否被跟卖→关键词排名是否掉落→竞品是否大幅降价" },
+    { q:"遇到断货情况你会怎么做？", tip:"立即暂停广告→评估空运补货可行性→设置价格保护→联系供应商加急→复盘补货模型" },
+    { q:"如何处理大量差评影响转化率的情况？", tip:"分析差评共性→产品改进（通知供应商）→联系合理投诉客户→利用Vine计划补正面评价→更新Listing说明" },
+  ]},
+  { category:"面试官真实意图", icon:"🔍", special:true, questions:[
+    { q:"说说你的优缺点", tip:"⚡ 真实意图：看自我认知。优点联系运营岗（数据敏感+执行力强），缺点要真实但说明改进行动" },
+    { q:"你为什么想做亚马逊运营？", tip:"⚡ 真实意图：看稳定性和动机。强调对跨境电商的兴趣、接受数据驱动决策的工作方式、希望接触全球市场" },
+    { q:"你如何学习一个陌生领域？", tip:"⚡ 真实意图：看学习能力。举具体例子：买课+实操+建立知识体系+向前辈请教，展示行动力" },
+  ]},
+];
+
+// ============ STATE ============
+let currentSection = 0;
+let currentMetric = 0;
+let currentDetailTab = 'what';
+
+// ============ INIT ============
+function init() {
+  buildKnowledge();
+  buildMetrics();
+  buildInterview();
+}
+
+// ============ MAIN TAB ============
+function switchMain(tab) {
+  ['knowledge','metrics','interview'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach((btn,i) => {
+    btn.classList.toggle('active', ['knowledge','metrics','interview'][i]===tab);
+  });
+}
+
+// ============ KNOWLEDGE ============
+function buildKnowledge() {
+  const nav = document.getElementById('secNav');
+  const content = document.getElementById('secContent');
+  nav.innerHTML = sections.map((s,i) => `
+    <button class="sec-btn ${i===0?'active':''}" style="--c:${s.color}" onclick="switchSection(${i})">${s.icon} ${s.title.split('（')[0]}</button>
+  `).join('');
+  renderSection(0);
+}
+
+function switchSection(idx) {
+  currentSection = idx;
+  document.querySelectorAll('.sec-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  renderSection(idx);
+}
+
+function renderSection(idx) {
+  const s = sections[idx];
+  const content = document.getElementById('secContent');
+  content.innerHTML = `
+    <div class="section-title" style="--c:${s.color}">
+      <span style="font-size:24px">${s.icon}</span>
+      <h2>${s.title}</h2>
+    </div>
+    ${s.items.map((item,i) => `
+      <div class="accordion" style="--c:${s.color}" id="acc-${idx}-${i}">
+        <button class="acc-trigger" onclick="toggleAcc('acc-${idx}-${i}')">
+          <span>${item.q}</span>
+          <span class="acc-arrow">▼</span>
+        </button>
+        <div class="acc-body">${item.a}</div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function toggleAcc(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ============ METRICS ============
+function buildMetrics() {
+  const grid = document.getElementById('metricsGrid');
+  const tags = document.getElementById('quickTags');
+  grid.innerHTML = metrics.map((m,i) => `
+    <button class="metric-btn ${i===0?'active':''}" style="--c:${m.color}" id="mbtn-${i}" onclick="selectMetric(${i})">
+      <span class="m-emoji">${m.emoji}</span>
+      <span class="m-name">${m.name}</span>
+    </button>
+  `).join('');
+  tags.innerHTML = metrics.map((m,i) => `
+    <button class="quick-tag" style="--c:${m.color};color:${m.color};border-color:${m.color}66" onclick="selectMetric(${i})">${m.emoji} ${m.name}</button>
+  `).join('');
+  renderMetric(0);
+}
+
+function selectMetric(idx) {
+  currentMetric = idx;
+  currentDetailTab = 'what';
+  document.querySelectorAll('.metric-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  renderMetric(idx);
+  document.getElementById('metricsGrid').scrollIntoView({behavior:'smooth'});
+}
+
+function renderMetric(idx) {
+  const m = metrics[idx];
+  const detail = document.getElementById('metricDetail');
+  detail.style.borderColor = m.color+'33';
+  detail.innerHTML = `
+    <div class="detail-header" style="background:linear-gradient(135deg,${m.color}18,transparent);border-bottom:1px solid ${m.color}22">
+      <div class="detail-title-row">
+        <span class="detail-emoji">${m.emoji}</span>
+        <div>
+          <div style="display:flex;align-items:baseline">
+            <span class="detail-name" style="color:${m.color}">${m.name}</span>
+            <span class="detail-full">${m.full}</span>
+          </div>
+          <div class="detail-cn">${m.cn}</div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-tabs">
+      <button class="dtab active" style="--c:${m.color}" id="dtab-what" onclick="switchDetailTab('what',${idx})">是什么</button>
+      <button class="dtab" style="--c:${m.color}" id="dtab-bench" onclick="switchDetailTab('bench',${idx})">健康值</button>
+      <button class="dtab" style="--c:${m.color}" id="dtab-action" onclick="switchDetailTab('action',${idx})">怎么做</button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-panel active" id="dpanel-what">
+        <div class="info-box">
+          <div class="info-label">计算公式</div>
+          <div class="formula-text" style="color:${m.color}">${m.formula}</div>
+        </div>
+        <div class="info-box">
+          <div class="info-label">举个例子</div>
+          <div class="example-text">${m.example}</div>
+        </div>
+        <div class="remember-box" style="background:${m.color}0f;border:1px solid ${m.color}33">
+          <div class="remember-label" style="color:${m.color}">💡 一句话记住它</div>
+          <div class="remember-text">${m.remember}</div>
+        </div>
+      </div>
+      <div class="detail-panel" id="dpanel-bench">
+        <div class="info-label" style="margin-bottom:12px">行业参考标准</div>
+        ${m.levels.map(lv=>`
+          <div class="level-item" style="background:${lv.color}10;border:1px solid ${lv.color}33">
+            <div class="level-left">
+              <div class="level-dot" style="background:${lv.color}"></div>
+              <span class="level-label">${lv.label}</span>
+            </div>
+            <span class="level-value" style="color:${lv.color}">${lv.value}</span>
+          </div>
+        `).join('')}
+        <div class="info-box" style="margin-top:8px">
+          <div class="info-label">参考区间说明</div>
+          <div class="example-text">${m.benchmark}</div>
+        </div>
+      </div>
+      <div class="detail-panel" id="dpanel-action">
+        <div class="info-label" style="margin-bottom:12px">遇到问题时的行动清单</div>
+        ${m.actions.map((a,i)=>`
+          <div class="action-item">
+            <div class="action-num" style="background:${m.color}22;border:1px solid ${m.color}44;color:${m.color}">${i+1}</div>
+            <span class="action-text">${a}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function switchDetailTab(tab, idx) {
+  currentDetailTab = tab;
+  ['what','bench','action'].forEach(t => {
+    document.getElementById('dtab-'+t)?.classList.toggle('active', t===tab);
+    document.getElementById('dpanel-'+t)?.classList.toggle('active', t===tab);
+  });
+}
+
+// ============ INTERVIEW ============
+function buildInterview() {
+  const content = document.getElementById('interviewContent');
+  content.innerHTML = interviewData.map((cat,ci) => `
+    <div class="interview-section">
+      <div class="int-sec-title">
+        <span style="font-size:18px">${cat.icon}</span>
+        <h3>${cat.category}</h3>
+      </div>
+      ${cat.questions.map((q,qi) => `
+        <div class="int-accordion ${cat.special?'special':''}" id="iacc-${ci}-${qi}">
+          <button class="int-trigger" onclick="toggleIntAcc('iacc-${ci}-${qi}')">
+            <span>❓ ${q.q}</span>
+            <span style="font-size:13px;flex-shrink:0;transition:transform .2s" id="iarr-${ci}-${qi}">▼</span>
+          </button>
+          <div class="int-body">
+            <div class="int-body-label">💬 答题方向</div>
+            <div class="int-body-text">${q.tip}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function toggleIntAcc(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+init();
+</script>
+</body>
+</html>
+ENDOFFILE
+echo "done"
+Output
+
+done
